@@ -2,10 +2,8 @@
 
 import {
   Alert,
-  Box,
   Button,
   Container,
-  Flex,
   Grid,
   Group,
   Modal,
@@ -15,7 +13,6 @@ import {
   Textarea,
 } from "@mantine/core";
 import { FormEvent, useCallback, useState } from "react";
-
 import axios from "axios";
 import { useMutation, useQuery } from "react-query";
 import { useDisclosure } from "@mantine/hooks";
@@ -34,6 +31,7 @@ const useCodeSubmit = () => {
       code,
     });
   };
+
   return useMutation(submitCode);
 };
 
@@ -46,26 +44,33 @@ const useCodeList = () => {
 const useCodeSave = () => {
   const saveCode = async ({ code, name }: { code: string; name: string }) => {
     console.log(code);
+
     return axios.post("http://localhost:8000/code", {
       code,
       name,
     });
   };
+
   return useMutation(saveCode);
 };
 
 export default function Home() {
   const { mutate: submit, isLoading, isError, error } = useCodeSubmit();
+
   const { mutate: save, isLoading: isSaving } = useCodeSave();
+
+  const { data } = useCodeList();
+
   const [code, setCode] = useState("");
   const [codeName, setCodeName] = useState("");
   const [stdOut, setStdOut] = useState(null);
   const [stdErr, setStdErr] = useState(null);
+
   const [opened, { open, close }] = useDisclosure();
   const [openedView, { open: openView, close: closeView }] = useDisclosure();
-  const { data } = useCodeList();
 
   const codeArray = (data?.data as Code[]) || null;
+
   const handleSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -90,12 +95,14 @@ export default function Home() {
   const handleSaveConfirm = async () => {
     if (codeName) {
       await save({ code, name: codeName });
+
       close();
     }
   };
 
   const handleLoad = (code: string) => {
     setCode(code);
+
     closeView();
   };
 
@@ -104,6 +111,7 @@ export default function Home() {
       <Container p="10px 10px">
         <h1>SavaScript</h1>
       </Container>
+
       <form onSubmit={handleSubmit}>
         <Grid>
           <Grid.Col span={9}>
@@ -117,6 +125,7 @@ export default function Home() {
               minRows={10}
               onChange={(e) => setCode(e.target.value)}
             />
+
             {stdOut && (
               <Alert
                 color="cyan"
@@ -129,6 +138,7 @@ export default function Home() {
                 {stdOut}
               </Alert>
             )}
+
             {isError && (
               <Alert
                 color="red"
@@ -141,6 +151,7 @@ export default function Home() {
                 {(error as any).message}
               </Alert>
             )}
+
             {stdErr && (
               <Alert
                 color="red"
@@ -159,11 +170,13 @@ export default function Home() {
               </Alert>
             )}
           </Grid.Col>
+
           <Grid.Col span={2}>
             <Stack gap={12}>
               <Button h={60} loading={isLoading} type="submit" fullWidth>
                 Send
               </Button>
+
               <Button
                 h={60}
                 loading={isLoading}
@@ -173,6 +186,7 @@ export default function Home() {
               >
                 Save code
               </Button>
+
               <Button
                 h={60}
                 loading={isLoading}
@@ -186,6 +200,7 @@ export default function Home() {
           </Grid.Col>
         </Grid>
       </form>
+
       <Modal onClose={close} opened={opened}>
         <Stack gap={10}>
           <TextInput
@@ -193,11 +208,13 @@ export default function Home() {
             value={codeName}
             onChange={(e) => setCodeName(e.target.value)}
           />
+
           <Button onClick={handleSaveConfirm} loading={isSaving}>
             save code
           </Button>
         </Stack>
       </Modal>
+
       <Modal
         onClose={closeView}
         opened={openedView}
@@ -208,8 +225,11 @@ export default function Home() {
             codeArray.map((code) => (
               <Group key={code._id} gap={20}>
                 <Text>{code.code}</Text>
+
                 <Text>{code.name}</Text>
+
                 <Text>{code.createdOn}</Text>
+
                 <Button onClick={() => handleLoad(code.code)}>Load</Button>
               </Group>
             ))}

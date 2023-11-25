@@ -1,10 +1,10 @@
 "use client";
 
-import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { MantineProvider, createTheme } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "@mantine/core/styles.css";
+
 const inter = Inter({ subsets: ["latin"] });
 
 const queryClient = new QueryClient();
@@ -32,6 +32,7 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <MantineProvider theme={theme}>
             {children}
+
             {modal}
           </MantineProvider>
         </QueryClientProvider>
