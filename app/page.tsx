@@ -3,6 +3,7 @@
 import {
   Alert,
   Button,
+  Center,
   Container,
   Grid,
   Group,
@@ -13,53 +14,17 @@ import {
   Textarea,
 } from "@mantine/core";
 import { FormEvent, useCallback, useState } from "react";
-import axios from "axios";
-import { useMutation, useQuery } from "react-query";
 import { useDisclosure } from "@mantine/hooks";
 
-interface Code {
-  _id: string;
-  code: string;
-  name: string;
-  createdOn: string;
-}
-
-const useCodeSubmit = () => {
-  const submitCode = async (code: string) => {
-    console.log(code);
-    return axios.post("http://localhost:8000/submit", {
-      code,
-    });
-  };
-
-  return useMutation(submitCode);
-};
-
-const useCodeList = () => {
-  const listCode = () => axios.get("http://localhost:8000/code");
-
-  return useQuery(["code"], listCode);
-};
-
-const useCodeSave = () => {
-  const saveCode = async ({ code, name }: { code: string; name: string }) => {
-    console.log(code);
-
-    return axios.post("http://localhost:8000/code", {
-      code,
-      name,
-    });
-  };
-
-  return useMutation(saveCode);
-};
+import { Code } from "@/types";
+import { codeApi } from "@/resources/code";
 
 export default function Home() {
-  const { mutate: submit, isLoading, isError, error } = useCodeSubmit();
+  const { mutate: submit, isLoading, isError, error } = codeApi.useCodeSubmit();
 
-  const { mutate: save, isLoading: isSaving } = useCodeSave();
+  const { mutate: save, isLoading: isSaving } = codeApi.useCodeSave();
 
-  const { data } = useCodeList();
+  const { data } = codeApi.useCodeList();
 
   const [code, setCode] = useState("");
   const [codeName, setCodeName] = useState("");
@@ -78,7 +43,8 @@ export default function Home() {
       setStdErr(null);
       submit(code, {
         onSuccess: (res) => {
-          const data = res.data;
+          const data = res;
+
           data.stderr ? setStdErr(data.stderr) : setStdOut(data.stdout);
         },
       });
@@ -108,9 +74,9 @@ export default function Home() {
 
   return (
     <div className="App">
-      <Container p="10px 10px">
+      <Center p="10px 10px">
         <h1>SavaScript</h1>
-      </Container>
+      </Center>
 
       <form onSubmit={handleSubmit}>
         <Grid>
@@ -228,7 +194,7 @@ export default function Home() {
 
                 <Text>{code.name}</Text>
 
-                <Text>{code.createdOn}</Text>
+                <Text>{code.createdOn?.toISOString()}</Text>
 
                 <Button onClick={() => handleLoad(code.code)}>Load</Button>
               </Group>
