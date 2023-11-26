@@ -18,15 +18,19 @@ import { useDisclosure } from "@mantine/hooks";
 
 import { Code } from "@/types";
 import { codeApi } from "@/resources/code";
+import { TextAreaLabel } from "@/components";
 
 export default function Home() {
   const { mutate: submit, isLoading, isError, error } = codeApi.useCodeSubmit();
 
   const { mutate: save, isLoading: isSaving } = codeApi.useCodeSave();
 
-  const { data } = codeApi.useCodeList();
+  const { mutate: update, isLoading: isUpdating } = codeApi.useCodeUpdate();
+
+  const { data, refetch } = codeApi.useCodeList();
 
   const [code, setCode] = useState("");
+  const [loadedCode, setLoadedCode] = useState<Code | null>(null);
   const [codeName, setCodeName] = useState("");
   const [stdOut, setStdOut] = useState(null);
   const [stdErr, setStdErr] = useState(null);
@@ -34,13 +38,17 @@ export default function Home() {
   const [opened, { open, close }] = useDisclosure();
   const [openedView, { open: openView, close: closeView }] = useDisclosure();
 
-  const codeArray = (data?.data as Code[]) || null;
+  const codeArray = (data as Code[]) || null;
+
+  const isEdited = loadedCode?.code !== code || loadedCode?.name !== codeName
 
   const handleSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+
       setStdOut(null);
       setStdErr(null);
+
       submit(code, {
         onSuccess: (res) => {
           const data = res;
@@ -60,16 +68,44 @@ export default function Home() {
 
   const handleSaveConfirm = async () => {
     if (codeName) {
-      await save({ code, name: codeName });
-
-      close();
+      await save({ code, name: codeName }, {
+        onSuccess: () => {
+          close();
+        }
+      });
     }
   };
 
-  const handleLoad = (code: string) => {
-    setCode(code);
+  const handleLoad = (code: Code) => {
+    setLoadedCode(code);
+    setCode(code.code);
+    setCodeName(code.name);
+    setStdOut(null);
+    setStdErr(null);
 
     closeView();
+  };
+
+  const handleExit = () => {
+    setLoadedCode(null);
+    setCode("");
+    setCodeName("");
+    setStdOut(null);
+    setStdErr(null);
+  }
+
+  const handleUpdateConfirm = async () => {
+    if (codeName && loadedCode) {
+      await update({ code, name: codeName, id: loadedCode._id }, {
+        onSuccess: async () => {
+          await refetch()
+
+          close();
+
+          handleExit();
+        }
+      });
+    }
   };
 
   return (
@@ -85,8 +121,11 @@ export default function Home() {
               style={{
                 fontSize: "24px",
               }}
+              label={loadedCode && 
+                <TextAreaLabel label={codeName} isEdited={isEdited} />
+              }
               value={code}
-              size="lg"
+              size="xl"
               name="code"
               minRows={10}
               onChange={(e) => setCode(e.target.value)}
@@ -94,7 +133,7 @@ export default function Home() {
 
             {stdOut && (
               <Alert
-                color="cyan"
+                color="green.5"
                 style={{
                   minHeight: "100px",
                   marginTop: "15px",
@@ -107,12 +146,12 @@ export default function Home() {
 
             {isError && (
               <Alert
-                color="red"
+                color="red.5"
                 style={{
                   minHeight: "100px",
                   marginTop: "15px",
-                  fontSize: "26px",
                 }}
+                fz="xl"
               >
                 {(error as any).message}
               </Alert>
@@ -139,29 +178,40 @@ export default function Home() {
 
           <Grid.Col span={2}>
             <Stack gap={12}>
-              <Button h={60} loading={isLoading} type="submit" fullWidth>
+              <Button h={60} disabled={!code} loading={isLoading} type="submit" fullWidth>
                 Send
               </Button>
 
               <Button
                 h={60}
+                disabled={!code}
                 loading={isLoading}
-                bg={"lime"}
+                color="green.6"
                 fullWidth
                 onClick={handleSave}
               >
-                Save code
+                {loadedCode ? "Update Code" : "Save Code"}
               </Button>
 
               <Button
                 h={60}
                 loading={isLoading}
-                bg={"pink"}
+                color="pink.5"
                 fullWidth
                 onClick={openView}
               >
                 Load Code
               </Button>
+
+              {loadedCode && <Button
+                h={60}
+                loading={isLoading}
+                color="grape.5"
+                fullWidth
+                onClick={handleExit}
+              >
+                Exit Edit
+              </Button>}
             </Stack>
           </Grid.Col>
         </Grid>
@@ -170,14 +220,28 @@ export default function Home() {
       <Modal onClose={close} opened={opened}>
         <Stack gap={10}>
           <TextInput
-            label="code name"
+            label="Code name"
             value={codeName}
             onChange={(e) => setCodeName(e.target.value)}
           />
 
-          <Button onClick={handleSaveConfirm} loading={isSaving}>
-            save code
-          </Button>
+          {loadedCode ? (
+            <Button 
+              disabled={!isEdited} 
+              onClick={handleUpdateConfirm} 
+              loading={isUpdating}
+            >
+              Update Code
+            </Button>
+          ) : (
+            <Button 
+              disabled={!codeName} 
+              onClick={handleSaveConfirm} 
+              loading={isSaving}
+            >
+              Save code
+            </Button>
+          )}
         </Stack>
       </Modal>
 
@@ -194,9 +258,9 @@ export default function Home() {
 
                 <Text>{code.name}</Text>
 
-                <Text>{code.createdOn?.toISOString()}</Text>
+                <Text>{code.createdOn}</Text>
 
-                <Button onClick={() => handleLoad(code.code)}>Load</Button>
+                <Button onClick={() => handleLoad(code)}>Load</Button>
               </Group>
             ))}
         </Stack>

@@ -1,0 +1,1 @@
+export { default as TextAreaLabel } from './TextAreaLabel/TextAreaLabel';

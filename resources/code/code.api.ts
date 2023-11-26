@@ -32,3 +32,15 @@ export const useCodeSave = () => {
 
   return useMutation(saveCode);
 };
+
+export const useCodeUpdate = () => {
+  const updateCode = async ({ code, name, id }: { code: string; name: string, id: string }) => {
+    return apiService.put("code", {
+      id,
+      code,
+      name,
+    });
+  };
+
+  return useMutation(updateCode);
+};
