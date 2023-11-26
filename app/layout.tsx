@@ -31,7 +31,7 @@ export default function RootLayout({
 
             {modal}
 
-            <Notifications autoClose={3000} position="top-right" />
+            <Notifications autoClose={5000} position="top-right" />
           </MantineProvider>
         </QueryClientProvider>
       </body>

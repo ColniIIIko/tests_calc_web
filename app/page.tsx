@@ -4,7 +4,6 @@ import {
   Alert,
   Button,
   Center,
-  Container,
   Grid,
   Group,
   Modal,
@@ -21,23 +20,39 @@ import { IconX, IconCheck } from '@tabler/icons-react'
 import { Code } from "@/types";
 import { codeApi } from "@/resources/code";
 import { TextAreaLabel } from "@/components";
+import { getErrorName } from "@/utils";
 
 export default function Home() {
-  const { mutate: submit, isLoading, isError, error } = codeApi.useCodeSubmit();
+  const { 
+    mutate: submit, 
+    isLoading, error: 
+    submitError 
+  } = codeApi.useCodeSubmit();
 
-  const { mutate: save, isLoading: isSaving } = codeApi.useCodeSave();
+  const { 
+    mutate: save, 
+    isLoading: isSaving, 
+    error: saveError }
+   = codeApi.useCodeSave();
 
-  const { mutate: update, isLoading: isUpdating } = codeApi.useCodeUpdate();
+  const { 
+    mutate: update, 
+    isLoading: isUpdating, 
+    error: updateError 
+  } = codeApi.useCodeUpdate();
 
-  const { mutate: deleteCode, isLoading: isDeleting } = codeApi.useCodeDelete();
+  const { 
+    mutate: deleteCode, 
+    isLoading: isDeleting, 
+    error: deleteError 
+  } = codeApi.useCodeDelete();
 
   const { data, refetch } = codeApi.useCodeList();
 
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState<string>("");
   const [loadedCode, setLoadedCode] = useState<Code | null>(null);
-  const [codeName, setCodeName] = useState("");
-  const [stdOut, setStdOut] = useState(null);
-  const [stdErr, setStdErr] = useState(null);
+  const [codeName, setCodeName] = useState<string>("");
+  const [stdOut, setStdOut] = useState<string | null>(null);
 
   const [opened, { open, close }] = useDisclosure();
   const [openedView, { open: openView, close: closeView }] = useDisclosure();
@@ -51,13 +66,41 @@ export default function Home() {
       e.preventDefault();
 
       setStdOut(null);
-      setStdErr(null);
 
       submit(code, {
         onSuccess: (res) => {
           const data = res;
 
-          data.stderr ? setStdErr(data.stderr) : setStdOut(data.stdout);
+          if (data.stderr) {
+            notifications.show({
+              title: 'Error',
+              color: 'red',
+              message: getErrorName(data.stderr),
+              icon: <IconX style={{ width: 18, height: 18 }} />,
+              radius: 'md',
+            });
+
+            return;
+          }
+
+          notifications.show({
+            title: 'Success',
+            message: 'Code was succesfully compiled !',
+            color: 'teal',
+            icon: <IconCheck style={{ width: 18, height: 18 }} />,
+            radius: 'md',
+          })
+
+          setStdOut(data.stdout);
+        },
+        onError: () => {
+          notifications.show({
+            title: 'Error',
+            color: 'red',
+            message: (submitError as any).message || 'Something went wrong. Try again !',
+            icon: <IconX style={{ width: 18, height: 18 }} />,
+            radius: 'md',
+          })
         },
       });
     },
@@ -90,7 +133,7 @@ export default function Home() {
           notifications.show({
             title: 'Error',
             color: 'red',
-            message: 'Something went wrong. Try again !',
+            message: (saveError as any).message || 'Something went wrong. Try again !',
             icon: <IconX style={{ width: 18, height: 18 }} />,
             radius: 'md',
           })
@@ -104,7 +147,6 @@ export default function Home() {
     setCode(code.code);
     setCodeName(code.name);
     setStdOut(null);
-    setStdErr(null);
 
     closeView();
   };
@@ -114,7 +156,6 @@ export default function Home() {
     setCode("");
     setCodeName("");
     setStdOut(null);
-    setStdErr(null);
   }
 
   const handleUpdateConfirm = async () => {
@@ -139,7 +180,7 @@ export default function Home() {
           notifications.show({
             title: 'Error',
             color: 'red',
-            message: 'Something went wrong. Try again !',
+            message: (updateError as any).message || 'Something went wrong. Try again !',
             icon: <IconX style={{ width: 18, height: 18 }} />,
             radius: 'md',
           })
@@ -169,7 +210,7 @@ export default function Home() {
         notifications.show({
           title: 'Error',
           color: 'red',
-          message: 'Something went wrong. Try again !',
+          message: (deleteError as any).message || 'Something went wrong. Try again !',
           icon: <IconX style={{ width: 18, height: 18 }} />,
           radius: 'md',
         })
@@ -206,41 +247,9 @@ export default function Home() {
                 style={{
                   minHeight: "100px",
                   marginTop: "15px",
-                  fontSize: "26px",
                 }}
               >
-                {stdOut}
-              </Alert>
-            )}
-
-            {isError && (
-              <Alert
-                color="red.5"
-                style={{
-                  minHeight: "100px",
-                  marginTop: "15px",
-                }}
-                fz="xl"
-              >
-                {(error as any).message}
-              </Alert>
-            )}
-
-            {stdErr && (
-              <Alert
-                color="red"
-                style={{
-                  minHeight: "100px",
-                  marginTop: "15px",
-                  fontSize: "26px",
-                }}
-                styles={{
-                  message: {
-                    fontSize: "lg",
-                  },
-                }}
-              >
-                {stdErr}
+                <Text fz={20}>{stdOut}</Text>
               </Alert>
             )}
           </Grid.Col>
