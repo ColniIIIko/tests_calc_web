@@ -15,6 +15,8 @@ import {
 } from "@mantine/core";
 import { FormEvent, useCallback, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from '@mantine/notifications';
+import { IconX, IconCheck } from '@tabler/icons-react'
 
 import { Code } from "@/types";
 import { codeApi } from "@/resources/code";
@@ -71,8 +73,27 @@ export default function Home() {
   const handleSaveConfirm = async () => {
     if (codeName) {
       await save({ code, name: codeName }, {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await refetch();
+
           close();
+
+          notifications.show({
+            title: 'Success',
+            message: 'Code was succesfully saved !',
+            color: 'teal',
+            icon: <IconCheck style={{ width: 18, height: 18 }} />,
+            radius: 'md',
+          })
+        },
+        onError: () => {
+          notifications.show({
+            title: 'Error',
+            color: 'red',
+            message: 'Something went wrong. Try again !',
+            icon: <IconX style={{ width: 18, height: 18 }} />,
+            radius: 'md',
+          })
         }
       });
     }
@@ -104,7 +125,24 @@ export default function Home() {
 
           close();
 
+          notifications.show({
+            title: 'Success',
+            message: 'Code was succesfully updated !',
+            color: 'teal',
+            icon: <IconCheck style={{ width: 18, height: 18 }} />,
+            radius: 'md',
+          })
+
           handleExit();
+        },
+        onError: () => {
+          notifications.show({
+            title: 'Error',
+            color: 'red',
+            message: 'Something went wrong. Try again !',
+            icon: <IconX style={{ width: 18, height: 18 }} />,
+            radius: 'md',
+          })
         }
       });
     }
@@ -115,13 +153,32 @@ export default function Home() {
       onSuccess: async () => {
         await refetch();
 
+        notifications.show({
+          title: 'Success',
+          message: 'Code was succesfully deleted !',
+          color: 'teal',
+          icon: <IconCheck style={{ width: 18, height: 18 }} />,
+          radius: 'md',
+        })
+
         handleExit();
+
+        closeView();
+      },
+      onError: () => {
+        notifications.show({
+          title: 'Error',
+          color: 'red',
+          message: 'Something went wrong. Try again !',
+          icon: <IconX style={{ width: 18, height: 18 }} />,
+          radius: 'md',
+        })
       }
     })
   }
 
   return (
-    <div className="App">
+    <div className="App" style={{ height: '100%' }}>
       <Center p="10px 10px">
         <h1>SavaScript</h1>
       </Center>

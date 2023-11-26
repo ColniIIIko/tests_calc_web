@@ -1,8 +1,10 @@
 "use client";
 
 import { MantineProvider } from "@mantine/core";
+import { Notifications } from '@mantine/notifications'
 import { QueryClient, QueryClientProvider } from "react-query";
 import "@mantine/core/styles.css";
+import '@mantine/notifications/styles.css';
 
 import theme from "@/theme/theme";
 
@@ -28,6 +30,8 @@ export default function RootLayout({
             {children}
 
             {modal}
+
+            <Notifications autoClose={3000} position="top-right" />
           </MantineProvider>
         </QueryClientProvider>
       </body>
