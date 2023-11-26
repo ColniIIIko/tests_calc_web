@@ -35,12 +35,19 @@ export const useCodeSave = () => {
 
 export const useCodeUpdate = () => {
   const updateCode = async ({ code, name, id }: { code: string; name: string, id: string }) => {
-    return apiService.put("code", {
-      id,
+    return apiService.put(`code/${id}`, {
       code,
       name,
     });
   };
 
   return useMutation(updateCode);
+};
+
+export const useCodeDelete = () => {
+  const deleteCode = async ({ id }: { id: string }) => {
+    return apiService.delete(`code/${id}`);
+  };
+
+  return useMutation(deleteCode);
 };

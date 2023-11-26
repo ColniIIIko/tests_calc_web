@@ -27,6 +27,8 @@ export default function Home() {
 
   const { mutate: update, isLoading: isUpdating } = codeApi.useCodeUpdate();
 
+  const { mutate: deleteCode, isLoading: isDeleting } = codeApi.useCodeDelete();
+
   const { data, refetch } = codeApi.useCodeList();
 
   const [code, setCode] = useState("");
@@ -98,7 +100,7 @@ export default function Home() {
     if (codeName && loadedCode) {
       await update({ code, name: codeName, id: loadedCode._id }, {
         onSuccess: async () => {
-          await refetch()
+          await refetch();
 
           close();
 
@@ -107,6 +109,16 @@ export default function Home() {
       });
     }
   };
+
+  const handleDelete = async (id: string) => {
+    await deleteCode({ id }, {
+      onSuccess: async () => {
+        await refetch();
+
+        handleExit();
+      }
+    })
+  }
 
   return (
     <div className="App">
@@ -205,6 +217,16 @@ export default function Home() {
 
               {loadedCode && <Button
                 h={60}
+                loading={isDeleting}
+                color="red.5"
+                fullWidth
+                onClick={() => handleDelete(loadedCode?._id)}
+              >
+                Delete Code
+              </Button>}
+
+              {loadedCode && <Button
+                h={60}
                 loading={isLoading}
                 color="grape.5"
                 fullWidth
@@ -261,6 +283,8 @@ export default function Home() {
                 <Text>{code.createdOn}</Text>
 
                 <Button onClick={() => handleLoad(code)}>Load</Button>
+
+                <Button loading={isDeleting} color="red.5" onClick={() => handleDelete(code._id)}>Delete</Button>
               </Group>
             ))}
         </Stack>
