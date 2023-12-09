@@ -228,17 +228,15 @@ export default function Home() {
         <Grid>
           <Grid.Col span={9}>
             <Textarea
-              style={{
-                fontSize: "24px",
-              }}
+              fz="24px"
               label={loadedCode && 
                 <TextAreaLabel label={codeName} isEdited={isEdited} />
               }
               value={code}
-              size="xl"
               name="code"
               minRows={10}
               onChange={(e) => setCode(e.target.value)}
+              autosize
             />
 
             {stdOut && (
