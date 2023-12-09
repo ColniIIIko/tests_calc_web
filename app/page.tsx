@@ -85,7 +85,7 @@ export default function Home() {
 
           notifications.show({
             title: 'Success',
-            message: 'Code was succesfully compiled !',
+            message: 'Code was successfully compiled !',
             color: 'teal',
             icon: <IconCheck style={{ width: 18, height: 18 }} />,
             radius: 'md',
@@ -196,7 +196,7 @@ export default function Home() {
 
         notifications.show({
           title: 'Success',
-          message: 'Code was succesfully deleted !',
+          message: 'Code was successfully deleted !',
           color: 'teal',
           icon: <IconCheck style={{ width: 18, height: 18 }} />,
           radius: 'md',

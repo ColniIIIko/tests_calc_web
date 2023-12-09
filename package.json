@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cypress:open": "cypress open"
   },
   "dependencies": {
     "@mantine/core": "^7.1.7",
@@ -14,6 +15,7 @@
     "@mantine/notifications": "^7.2.2",
     "@tabler/icons-react": "^2.42.0",
     "axios": "^1.6.0",
+    "cypress": "^13.6.1",
     "dotenv-flow": "^4.0.1",
     "next": "14.0.1",
     "react": "^18",
