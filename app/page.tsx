@@ -2,6 +2,7 @@
 
 import {
   Alert,
+  Box,
   Button,
   Center,
   Grid,
@@ -14,8 +15,8 @@ import {
 } from "@mantine/core";
 import { FormEvent, useCallback, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from '@mantine/notifications';
-import { IconX, IconCheck } from '@tabler/icons-react'
+import { notifications } from "@mantine/notifications";
+import { IconX, IconCheck } from "@tabler/icons-react";
 
 import { Code } from "@/types";
 import { codeApi } from "@/resources/code";
@@ -23,28 +24,28 @@ import { TextAreaLabel } from "@/components";
 import { getErrorName } from "@/utils";
 
 export default function Home() {
-  const { 
-    mutate: submit, 
-    isLoading, error: 
-    submitError 
+  const {
+    mutate: submit,
+    isLoading,
+    error: submitError,
   } = codeApi.useCodeSubmit();
 
-  const { 
-    mutate: save, 
-    isLoading: isSaving, 
-    error: saveError }
-   = codeApi.useCodeSave();
+  const {
+    mutate: save,
+    isLoading: isSaving,
+    error: saveError,
+  } = codeApi.useCodeSave();
 
-  const { 
-    mutate: update, 
-    isLoading: isUpdating, 
-    error: updateError 
+  const {
+    mutate: update,
+    isLoading: isUpdating,
+    error: updateError,
   } = codeApi.useCodeUpdate();
 
-  const { 
-    mutate: deleteCode, 
-    isLoading: isDeleting, 
-    error: deleteError 
+  const {
+    mutate: deleteCode,
+    isLoading: isDeleting,
+    error: deleteError,
   } = codeApi.useCodeDelete();
 
   const { data, refetch } = codeApi.useCodeList();
@@ -59,7 +60,7 @@ export default function Home() {
 
   const codeArray = (data as Code[]) || null;
 
-  const isEdited = loadedCode?.code !== code || loadedCode?.name !== codeName
+  const isEdited = loadedCode?.code !== code || loadedCode?.name !== codeName;
 
   const handleSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
@@ -73,34 +74,36 @@ export default function Home() {
 
           if (data.stderr) {
             notifications.show({
-              title: 'Error',
-              color: 'red',
+              title: "Error",
+              color: "red",
               message: getErrorName(data.stderr),
               icon: <IconX style={{ width: 18, height: 18 }} />,
-              radius: 'md',
+              radius: "md",
             });
 
             return;
           }
 
           notifications.show({
-            title: 'Success',
-            message: 'Code was successfully compiled !',
-            color: 'teal',
+            title: "Success",
+            message: "Code was successfully compiled !",
+            color: "teal",
             icon: <IconCheck style={{ width: 18, height: 18 }} />,
-            radius: 'md',
-          })
+            radius: "md",
+          });
 
           setStdOut(data.stdout);
         },
         onError: () => {
           notifications.show({
-            title: 'Error',
-            color: 'red',
-            message: (submitError as any).message || 'Something went wrong. Try again !',
+            title: "Error",
+            color: "red",
+            message:
+              (submitError as any).message ||
+              "Something went wrong. Try again !",
             icon: <IconX style={{ width: 18, height: 18 }} />,
-            radius: 'md',
-          })
+            radius: "md",
+          });
         },
       });
     },
@@ -115,30 +118,35 @@ export default function Home() {
 
   const handleSaveConfirm = async () => {
     if (codeName) {
-      await save({ code, name: codeName }, {
-        onSuccess: async () => {
-          await refetch();
+      await save(
+        { code, name: codeName },
+        {
+          onSuccess: async () => {
+            await refetch();
 
-          close();
+            close();
 
-          notifications.show({
-            title: 'Success',
-            message: 'Code was succesfully saved !',
-            color: 'teal',
-            icon: <IconCheck style={{ width: 18, height: 18 }} />,
-            radius: 'md',
-          })
-        },
-        onError: () => {
-          notifications.show({
-            title: 'Error',
-            color: 'red',
-            message: (saveError as any).message || 'Something went wrong. Try again !',
-            icon: <IconX style={{ width: 18, height: 18 }} />,
-            radius: 'md',
-          })
+            notifications.show({
+              title: "Success",
+              message: "Code was succesfully saved !",
+              color: "teal",
+              icon: <IconCheck style={{ width: 18, height: 18 }} />,
+              radius: "md",
+            });
+          },
+          onError: () => {
+            notifications.show({
+              title: "Error",
+              color: "red",
+              message:
+                (saveError as any).message ||
+                "Something went wrong. Try again !",
+              icon: <IconX style={{ width: 18, height: 18 }} />,
+              radius: "md",
+            });
+          },
         }
-      });
+      );
     }
   };
 
@@ -156,70 +164,80 @@ export default function Home() {
     setCode("");
     setCodeName("");
     setStdOut(null);
-  }
+  };
 
   const handleUpdateConfirm = async () => {
     if (codeName && loadedCode) {
-      await update({ code, name: codeName, id: loadedCode._id }, {
-        onSuccess: async () => {
-          await refetch();
+      await update(
+        { code, name: codeName, id: loadedCode._id },
+        {
+          onSuccess: async () => {
+            await refetch();
 
-          close();
+            close();
 
-          notifications.show({
-            title: 'Success',
-            message: 'Code was succesfully updated !',
-            color: 'teal',
-            icon: <IconCheck style={{ width: 18, height: 18 }} />,
-            radius: 'md',
-          })
+            notifications.show({
+              title: "Success",
+              message: "Code was succesfully updated !",
+              color: "teal",
+              icon: <IconCheck style={{ width: 18, height: 18 }} />,
+              radius: "md",
+            });
 
-          handleExit();
-        },
-        onError: () => {
-          notifications.show({
-            title: 'Error',
-            color: 'red',
-            message: (updateError as any).message || 'Something went wrong. Try again !',
-            icon: <IconX style={{ width: 18, height: 18 }} />,
-            radius: 'md',
-          })
+            handleExit();
+          },
+          onError: () => {
+            notifications.show({
+              title: "Error",
+              color: "red",
+              message:
+                (updateError as any).message ||
+                "Something went wrong. Try again !",
+              icon: <IconX style={{ width: 18, height: 18 }} />,
+              radius: "md",
+            });
+          },
         }
-      });
+      );
     }
   };
 
   const handleDelete = async (id: string) => {
-    await deleteCode({ id }, {
-      onSuccess: async () => {
-        await refetch();
+    await deleteCode(
+      { id },
+      {
+        onSuccess: async () => {
+          await refetch();
 
-        notifications.show({
-          title: 'Success',
-          message: 'Code was successfully deleted !',
-          color: 'teal',
-          icon: <IconCheck style={{ width: 18, height: 18 }} />,
-          radius: 'md',
-        })
+          notifications.show({
+            title: "Success",
+            message: "Code was successfully deleted !",
+            color: "teal",
+            icon: <IconCheck style={{ width: 18, height: 18 }} />,
+            radius: "md",
+          });
 
-        handleExit();
+          handleExit();
 
-        closeView();
-      },
-      onError: () => {
-        notifications.show({
-          title: 'Error',
-          color: 'red',
-          message: (deleteError as any).message || 'Something went wrong. Try again !',
-          icon: <IconX style={{ width: 18, height: 18 }} />,
-          radius: 'md',
-        })
+          closeView();
+        },
+        onError: () => {
+          notifications.show({
+            title: "Error",
+            color: "red",
+            message:
+              (deleteError as any).message ||
+              "Something went wrong. Try again !",
+            icon: <IconX style={{ width: 18, height: 18 }} />,
+            radius: "md",
+          });
+        },
       }
-    })
-  }
+    );
+  };
 
   return (
-    <div className="App" style={{ height: '100%' }}>
+    <div className="App" style={{ height: "100%" }}>
       <Center p="10px 10px">
         <h1>SavaScript</h1>
       </Center>
@@ -229,8 +247,10 @@ export default function Home() {
           <Grid.Col span={9}>
             <Textarea
               fz="24px"
-              label={loadedCode && 
-                <TextAreaLabel label={codeName} isEdited={isEdited} />
+              label={
+                loadedCode && (
+                  <TextAreaLabel label={codeName} isEdited={isEdited} />
+                )
               }
               value={code}
               name="code"
@@ -247,14 +267,22 @@ export default function Home() {
                   marginTop: "15px",
                 }}
               >
-                {stdOut.split('\n').map(out => <Text fz={20}>{out}</Text>) }
+                {stdOut.split("\n").map((out) => (
+                  <Text fz={20}>{out}</Text>
+                ))}
               </Alert>
             )}
           </Grid.Col>
 
           <Grid.Col span={2}>
             <Stack gap={12}>
-              <Button h={60} disabled={!code} loading={isLoading} type="submit" fullWidth>
+              <Button
+                h={60}
+                disabled={!code}
+                loading={isLoading}
+                type="submit"
+                fullWidth
+              >
                 Send
               </Button>
 
@@ -279,25 +307,29 @@ export default function Home() {
                 Load Code
               </Button>
 
-              {loadedCode && <Button
-                h={60}
-                loading={isDeleting}
-                color="red.5"
-                fullWidth
-                onClick={() => handleDelete(loadedCode?._id)}
-              >
-                Delete Code
-              </Button>}
+              {loadedCode && (
+                <Button
+                  h={60}
+                  loading={isDeleting}
+                  color="red.5"
+                  fullWidth
+                  onClick={() => handleDelete(loadedCode?._id)}
+                >
+                  Delete Code
+                </Button>
+              )}
 
-              {loadedCode && <Button
-                h={60}
-                loading={isLoading}
-                color="grape.5"
-                fullWidth
-                onClick={handleExit}
-              >
-                Exit Edit
-              </Button>}
+              {loadedCode && (
+                <Button
+                  h={60}
+                  loading={isLoading}
+                  color="grape.5"
+                  fullWidth
+                  onClick={handleExit}
+                >
+                  Exit Edit
+                </Button>
+              )}
             </Stack>
           </Grid.Col>
         </Grid>
@@ -312,17 +344,17 @@ export default function Home() {
           />
 
           {loadedCode ? (
-            <Button 
-              disabled={!isEdited} 
-              onClick={handleUpdateConfirm} 
+            <Button
+              disabled={!isEdited}
+              onClick={handleUpdateConfirm}
               loading={isUpdating}
             >
               Update Code
             </Button>
           ) : (
-            <Button 
-              disabled={!codeName} 
-              onClick={handleSaveConfirm} 
+            <Button
+              disabled={!codeName}
+              onClick={handleSaveConfirm}
               loading={isSaving}
             >
               Save code
@@ -339,7 +371,12 @@ export default function Home() {
         <Stack gap={10}>
           {codeArray &&
             codeArray.map((code) => (
-              <Group key={code._id} gap={20}>
+              <Box
+                mod={{ cy: "saved-code" }}
+                component={Group}
+                key={code._id}
+                gap={20}
+              >
                 <Text>{code.code}</Text>
 
                 <Text>{code.name}</Text>
@@ -348,8 +385,14 @@ export default function Home() {
 
                 <Button onClick={() => handleLoad(code)}>Load</Button>
 
-                <Button loading={isDeleting} color="red.5" onClick={() => handleDelete(code._id)}>Delete</Button>
-              </Group>
+                <Button
+                  loading={isDeleting}
+                  color="red.5"
+                  onClick={() => handleDelete(code._id)}
+                >
+                  Delete
+                </Button>
+              </Box>
             ))}
         </Stack>
       </Modal>
