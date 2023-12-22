@@ -2,7 +2,7 @@ describe('Behavior of app is correct', () => {
   
   beforeEach(() => {
     cy.visit('/');
-    cy.get('textarea').as('editor');
+    cy.get('form textarea').as('editor');
     cy.get('span').contains('Send').parent().parent().as('send-btn');
     cy.get('span').contains('Save Code').parent().parent().as('save-btn');
     cy.get('span').contains('Load Code').parent().parent().as('load-btn');
