@@ -247,7 +247,7 @@ export default function Home() {
                   marginTop: "15px",
                 }}
               >
-                {stdOut.split('\n').map(out => <Text fz={20}>{out}</Text>) }
+                {stdOut.split('\n').filter(out => !!out).map(out => <Text fz={20}>{out}</Text>) }
               </Alert>
             )}
           </Grid.Col>
