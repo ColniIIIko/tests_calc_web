@@ -22,7 +22,6 @@ describe('Test all correct inputs', () => {
     cy.visit('/');
     cy.get('form textarea').as('editor');
     cy.get('span').contains('Send').parent().parent().as('send-btn');
-    cy.intercept("POST", '/submit').as('sendCode')
   })
 
   for(let {input, expectedResult} of successTestCasesWithVariables){
