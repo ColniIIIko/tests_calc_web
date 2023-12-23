@@ -4,7 +4,6 @@ describe('Button Load', () => {
     cy.visit('/');
     cy.get('form .mantine-Textarea-input').as('editor');
     cy.get('span').contains('Load Code').parent().parent().as('load-btn');
-    cy.intercept("POST", '/submit').as('sendCode');
   });
 
   it('Open modal', () => {

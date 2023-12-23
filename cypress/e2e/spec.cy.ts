@@ -6,7 +6,6 @@ describe('Behavior of app is correct', () => {
     cy.get('span').contains('Send').parent().parent().as('send-btn');
     cy.get('span').contains('Save Code').parent().parent().as('save-btn');
     cy.get('span').contains('Load Code').parent().parent().as('load-btn');
-    cy.intercept("POST", '/submit').as('sendCode')
   })
 
   it('Textarea is empty and buttons disabled', () => {

@@ -3,8 +3,6 @@ describe('Button Save', () => {
     cy.visit('/');
     cy.get('form .mantine-Textarea-input').as('editor');
     cy.get('span').contains('Save Code').parent().parent().as('save-btn');
-    cy.intercept("POST", '/submit').as('sendCode');
-    cy.intercept("GET", '/code').as('getCode');
   });
 
   it('Valid input and valid name', () => {
